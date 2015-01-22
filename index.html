@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<head>
+    <title>Comet Server - Пример online консультанта</title>
+    <script language="JavaScript" type="text/javascript" src="https://comet-server.ru/template/Profitable_site/js/jquery-2.0.3.min.js" ></script> 
+    <script language="JavaScript" type="text/javascript" src="http://test5.lan/tabSignal.js/tabSignal.js" ></script>
+</head>
+<body>
+ 
+    <a href="/" >Ещё вкладка</a>
+    
+    <div id="consultantHolder"></div>
+    <script>
+ 
+function tryStartMasterTab(masterCallback, slaveCallback)
+{ 
+     var time_id = false;
+     var last_time_id = false;
+     var start_timer = 2000;
+     
+     if( window.InTryStartMasterTab != undefined )
+     {
+        console.log("Уеже запущено");
+        return InTryStartMasterTab;
+     }
+    console.log("Запуск tryStartMasterTab");
+     
+     InTryStartMasterTab = 0;
+
+    var setAsMaster = function(){
+        // Отписываемся от уведомлений о наличии мастер вкладки
+        tabSignal().disconnect("comet_msg_connect", 'comet_msg_master_signal');
+
+        // Испускаем сигнал для уведомления всех остальных вкладок о своём превосходстве
+        tabSignal().emitAll('comet_msg_master_signal')
+
+        // Поставим таймер для уведомления всех остальных вкладок о своём превосходстве
+        setInterval(function()
+        {
+            tabSignal().emitAll('comet_msg_master_signal')
+            console.log("Мы мастер!");
+        }, start_timer/8);
+
+        InTryStartMasterTab = 1;
+        if(masterCallback) masterCallback();
+    }
+
+
+     // Подключаемся на уведомления от других вкладок о том что уже есть мастер вкладка,
+     // если за start_timer милисекунд уведомление произойдёт то отменим поставленый ранее таймер
+     tabSignal().connect("comet_msg_connect",'comet_msg_master_signal', function()
+     {
+        if(time_id !== false) //  отменим поставленый ранее таймер если это ещё не сделано
+        {
+            console.log("Мы slave!, clearTimeout(time_id="+time_id+")");
+            clearTimeout( time_id );
+            time_id = setTimeout(setAsMaster, start_timer )
+        }
+
+         if(InTryStartMasterTab == 0)
+         {
+             if(slaveCallback) slaveCallback();
+         }
+         InTryStartMasterTab = -1;
+     })
+
+     // Создадим таймер, если этот таймер не будет отменён за start_timer милисекунд то считаем себя мастер вкладкой
+     time_id = setTimeout(setAsMaster, start_timer )
+
+}
+
+$(document).ready(function(){
+    setTimeout(function(){
+        tryStartMasterTab();
+    }, 500)
+
+})
+    </script>
+</body>
+</html>
+
