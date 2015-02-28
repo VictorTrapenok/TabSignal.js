@@ -73,7 +73,7 @@ tabSignal.disconnect = function(slot_name, signal_name)
  */
 tabSignal.emit = function(signal_name, param)
 {
-    if (tabSignal.slotArray[signal_name] === undefined)last_custom_id
+    if (tabSignal.slotArray[signal_name] === undefined)
     {
         if(tabSignal.debug) console.log("На сигнал " + signal_name + " нет подписчиков" )
     }
