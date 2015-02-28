@@ -73,7 +73,7 @@ tabSignal.disconnect = function(slot_name, signal_name)
  */
 tabSignal.emit = function(signal_name, param)
 {
-    if (tabSignal.slotArray[signal_name] === undefined)
+    if (tabSignal.slotArray[signal_name] === undefined)last_custom_id
     {
         if(tabSignal.debug) console.log("На сигнал " + signal_name + " нет подписчиков" )
     }
@@ -103,8 +103,6 @@ tabSignal.emitAll = function (signal_name, param)
     if(window['localStorage'] !==undefined  )
     {
         var curent_custom_id = Math.random()+"_"+Math.random()+"_"+Math.random()+"_"+Math.random()+"_"+Math.random()
-
-        last_custom_id = curent_custom_id.replace(/0\./img,"")
         window['localStorage']['tabSignal_storage_emit']= JSON.stringify({name:signal_name, custom_id:curent_custom_id, param:param});
     }
 }
